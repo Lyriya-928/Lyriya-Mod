@@ -1,62 +1,87 @@
 # Lyriya Mod
 
-Lyriya Mod 是面向技术生存、生电和红石工程的 Fabric 客户端实用工具集合。许多功能参考或适配自其他开源项目；本项目不是这些功能的唯一原作者，也不要求安装 Meteor Client 或 Meteor Lotus。
+English | [简体中文](README.zh-CN.md)
 
-> **早期 Demo：** 当前版本仍在早期开发阶段。部分功能尚未经过本项目维护者的完整游戏内验证，已知 Auto Helmet 可能无法正常触发；NoRender、Freecam、自动合成等功能也需要按实际场景继续验证。功能实现状态和已知边界见下文及 `docs/`。
+Lyriya Mod is a collection of Fabric client-side utilities for technical survival, redstone engineering, and technical Minecraft gameplay. Many features are inspired by or adapted from other open-source projects. Lyriya Mod does not claim original authorship of every included feature and does not require Meteor Client or Meteor Lotus.
 
-## 安装
+> **Early Demo:** This project is still in an early stage of development. Some features have not been fully verified in-game by the project maintainer. Auto Helmet may fail to trigger as expected, while NoRender, Freecam, Auto Crafting, and other features require further testing in real gameplay scenarios. Implementation status and known limitations are documented below and in `docs/`.
 
-使用 Minecraft 26.3、Fabric Loader 0.19.5+、Fabric API 0.161.0+26.3 和 Java 25+。将以下模组分别放入实例的 `mods` 目录：
+## Installation
 
-- **MaLiLib Fabric 26.3-0.30.2**（必需）：从 [Modrinth](https://modrinth.com/mod/malilib/version/0.30.2) 或 [CurseForge](https://www.curseforge.com/minecraft/mc-mods/malilib/files/9100218) 获取 `malilib-fabric-26.3-0.30.2.jar`。MaLiLib 是独立的 LGPL-3.0-only 依赖，不包含在 Lyriya JAR 中。
-- **Lyriya Mod 0.1.0**：构建文件为 `build/libs/lyriya-mod-0.1.0.jar`。
+Requirements:
 
-Fabric 元数据将 `malilib >= 0.30.2` 声明为必需运行时依赖。不要同时安装 Meteor Client 或 Lotus 来满足 Lyriya 的依赖。
+- Minecraft 26.3
+- Fabric Loader 0.19.5 or later
+- Fabric API 0.161.0+26.3 or a compatible version
+- Java 25 or later
 
-## 配置
+Place the following mod JARs in your instance's `mods` directory:
 
-Lyriya 使用 MaLiLib 配置面板、选项组件、按键绑定和 JSON 持久化。默认按 **反斜杠键 `\`** 打开配置面板，可在 **General → Open configuration** 修改。配置保存在 `config/lyriya-mod.json`。原有设置会保留；旧的 `L + Y` 默认面板绑定会迁移为反斜杠，其他玩家自定义绑定不变。
+- **MaLiLib Fabric 26.3-0.30.2 (required):** Obtain `malilib-fabric-26.3-0.30.2.jar` from [Modrinth](https://modrinth.com/mod/malilib/version/0.30.2) or [CurseForge](https://www.curseforge.com/minecraft/mc-mods/malilib/files/9100218). MaLiLib is a separate LGPL-3.0-only dependency and is not bundled with the Lyriya JAR.
+- **Lyriya Mod 0.1.0:** The build artifact is `build/libs/lyriya-mod-0.1.0.jar`.
 
-General 中的 **Toggle Notifications** 默认开启。功能被手动切换时，提示显示在 HUD 覆盖消息位置，不写入聊天；配置加载时不会逐项弹出提示。Debug Logging 和 Debug Messages 默认关闭；调试消息只在 Auto Crafting 没有白名单目标或没有材料充足的配方时最多提示一次。
+Fabric metadata declares `malilib >= 0.30.2` as a required runtime dependency. Do not install Meteor Client or Meteor Lotus to satisfy Lyriya Mod's dependencies.
 
-## 功能状态
+## Configuration
 
-以下描述表示代码中存在对应实现，不代表本轮经过游戏内验证。Entity List 和 Portals 曾由用户在此前版本中初步测试正常；本轮未启动客户端。
+Lyriya Mod uses MaLiLib for its configuration panel, option components, keybindings, and JSON persistence.
 
-- **Auto Helmet**（`H`）：保留原有猪灵附近装备金头盔逻辑。本轮冻结，用户此前反馈可能不触发；没有修改其检测、触发、背包交互或装备逻辑。
-- **Entity List**（`J`）：统计客户端当前实体数据中的实体并保留类别过滤。现在可设置左右/上下锚点、边距、X/Y 偏移、缩放、最大行数、行距、阴影，以及掉落物、玩家、敌对/被动生物和其他实体的颜色。统计不覆盖未加载区块或服务器全部实体。
-- **Portals**（`P`）：保留传送门视觉效果期间继续使用受支持界面的行为。
-- **GUI Move**（`G`）：默认只允许库存/容器界面；可选其他符合条件的界面、跳跃、潜行和疾跑。文本输入及 Lyriya/MaLiLib 配置界面排除。
-- **Auto Totem**（`O`）：按健康值/Elytra 或始终模式，将背包图腾切换至副手。
-- **SafeWalk+**（`K`）：靠近前方无支撑方块边缘时，向玩家输入加入真实潜行状态；提供固定距离与随机区间模式。模块不锁定位置、不修改移动速度或坐标。跳跃时不会强制潜行。
-- **Auto Crafting**：使用底部的 **Add items / Remove items** 选择本地化物品名称白名单。模式可选打开工作台自动执行或快捷键控制；快捷键模式默认用 **F6** 启停任务。功能选项需先启用；仅使用客户端已知且材料充足的配方，并且只收取白名单产物。旧单目标配置会迁移到白名单。
-- **Fullbright**（`F7`）：在 Gamma（覆盖光照贴图，不改玩家 Gamma 选项）、Potion（本地夜视效果，默认目标持续 120 秒）和 Luminance（Block/Sky 最低光照等级）三种模式中选择。Potion 模式不会主动替换检测到的其他来源夜视效果。
-- **NoRender**（`N`）：当前已实现参考版本中的覆盖层、HUD、雾效、天气/世界边界/破坏进度、信标/附魔书/告示牌/坠落方块、地图、烟花、刷怪笼、盔甲、实体可见性/发光、进食粒子、附魔光效、文字混淆、签名标记、屏障显示、方块随机旋转，以及可选择的实体、方块实体和粒子列表。三类列表通过本地化/可读名称选择并持久化。默认关闭的 **Drop Spawn Packets** 会丢弃匹配实体的生成数据包，使其不进入客户端世界；这会影响客户端实体可用性，不只是视觉效果。Cave Culling 和 Banner Render Mode 尚未显示为选项，原因见 [NoRender 兼容性表](docs/NORENDER_COMPATIBILITY.md)。
-- **Freecam**（`F8`）：WASD、跳跃、潜行由自由相机消费，不送入玩家移动输入；相机位置与方向逐帧插值，对角线移动归一化。默认显示手部，可关闭。自由视角只改变客户端相机，不改变服务端玩家位置。
-- **No Ghost Blocks**（`F9`）：尝试减少受支持方块破坏/放置操作中的客户端预测；不保证修复所有服务端同步问题。
+The default keybinding for opening the configuration panel is **Backslash (`\`)**. You can change it under **General → Open configuration**.
 
-NoRender 的选项按 Overlay、HUD、World、Entity 分类；并非参考项目中的全部选项都已实现或开放配置。各项兼容状态、目标版本钩子和行为边界见 [NoRender 兼容性表](docs/NORENDER_COMPATIBILITY.md)。功能列表表示代码实现状态，不代表均已通过本项目的游戏内验证。
+Configuration is stored in `config/lyriya-mod.json`. Existing settings are preserved. The legacy `L + Y` configuration-panel shortcut is migrated to Backslash, while other user-defined keybindings remain unchanged.
 
-## 上游项目与许可
+**Toggle Notifications** is enabled by default. Notifications appear in the HUD overlay message area when a feature is manually toggled and are not sent to chat. Loading configuration does not generate individual notifications for every module.
 
-Lyriya Mod 采用 **GPL-3.0-only**，完整条款见 [LICENSE](LICENSE)。项目从以下开源项目研究、参考或适配功能；详细提交、文件范围和许可证记录见 [docs/UPSTREAM_SOURCES.md](docs/UPSTREAM_SOURCES.md)。
+**Debug Logging** and **Debug Messages** are disabled by default. Auto Crafting debug messages are rate-limited to one notification when no whitelist target is available or no recipe has sufficient materials.
 
-- [Meteor Client](https://github.com/MeteorDevelopment/meteor-client)，Meteor Development，GPL-3.0。部分功能以其行为为参考；少量 No Ghost Blocks 和 Banner 渲染逻辑有源码适配，并在对应源码文件中保留版权及修改说明。
-- [Meteor Lotus](https://github.com/xiaohe66/xiaohe66-meteor-lotus)，GPL-3.0。用于研究若干功能；现有来源记录称没有复制其源码。
-- [MaLiLib](https://github.com/maruohon/malilib) 及其 [Minecraft 26.3 社区构建来源](https://github.com/sakura-ryoko/malilib)，LGPL-3.0。它是单独安装的运行时依赖，不包含在 Lyriya JAR 中。
+## Feature Status
 
-如果未来继续移植上游代码，需要保留相应版权和许可证声明，并在来源记录中注明修改范围。
+The descriptions below indicate that corresponding implementations exist in the code. They do not imply that every feature has been verified in-game during the current development cycle. Entity List and Portals were previously tested by the user and reported to work in earlier builds. The client was not launched for testing during the current cycle.
 
-## 构建
+- **Auto Helmet** (`H`): Retains the original behavior of equipping a golden helmet when piglins are nearby. This module is currently frozen. Previous user feedback indicated that it may fail to trigger. Its detection, activation, inventory interaction, and equipment logic have not been modified.
+- **Entity List** (`J`): Displays entities tracked by the client's current entity data, with category filters. Configuration includes horizontal and vertical anchors, margins, X/Y offsets, scaling, maximum line count, line spacing, shadows, and separate colors for dropped items, players, hostile/passive mobs, and other entities. The list does not include entities in unloaded chunks or every entity on the server.
+- **Portals** (`P`): Preserves the ability to interact with supported interfaces while portal visual effects are active.
+- **GUI Move** (`G`): By default, allows movement only in inventory and container interfaces. Other eligible interfaces, jumping, sneaking, and sprinting can be enabled through configuration. Text input and Lyriya/MaLiLib configuration interfaces are excluded.
+- **Auto Totem** (`O`): Moves a totem of undying from the inventory to the offhand according to the selected health-based, Elytra-related, or always-active mode.
+- **SafeWalk+** (`K`): Adds a genuine sneaking state to player input when approaching an unsupported block edge ahead. Supports fixed-distance and randomized-range modes. It does not lock the player's position or modify movement speed or coordinates. Forced sneaking is not applied while jumping.
+- **Auto Crafting**: Uses the **Add items / Remove items** controls to manage a whitelist of items by their localized names. Available modes include automatic execution when a crafting table is open and keybind-controlled execution. The keybind mode uses **F6** by default to start or stop a task. The relevant feature option must be enabled first. Only recipes known to the client with sufficient available materials are used, and only whitelisted outputs are collected. Legacy single-target configuration is migrated to the whitelist.
+- **Fullbright** (`F7`): Provides three modes: Gamma, Potion, and Luminance. Gamma overrides the lightmap without changing the player's Gamma setting. Potion applies a local night vision effect with a default target duration of 120 seconds. Luminance sets minimum block and sky light levels. Potion mode does not actively replace other detected sources of night vision.
+- **NoRender** (`N`): Implements rendering controls based on the reference implementation, including overlays, HUD elements, fog, weather, world borders, block-breaking progress, beacons, enchanted books, signs, falling blocks, maps, fireworks, spawners, armor, entity visibility and glowing, eating particles, enchantment glint, obfuscated text, signature indicators, barrier visibility, random block rotations, and configurable entity, block-entity, and particle lists. The three lists support selection by localized or readable names and persist their configuration. **Drop Spawn Packets** is disabled by default. When enabled, it discards spawn packets for matching entities, preventing them from entering the client world. This affects client-side entity availability and is not merely a visual change. Cave Culling and Banner Render Mode are not currently exposed as options. See the [NoRender Compatibility Matrix](docs/NORENDER_COMPATIBILITY.md) for details.
+- **Freecam** (`F8`): WASD, jump, and sneak inputs are consumed by the free camera rather than forwarded as player movement input. Camera position and orientation are interpolated each frame, and diagonal movement is normalized. Hand rendering is enabled by default and can be disabled. Freecam changes only the client-side camera and does not move the server-side player.
+- **No Ghost Blocks** (`F9`): Attempts to reduce client-side prediction issues during supported block-breaking and block-placement operations. It does not guarantee a fix for every server synchronization issue.
 
-使用 JDK 25 或更新版本：
+NoRender options are organized into Overlay, HUD, World, and Entity categories. Not every option from the reference project has been implemented or exposed for configuration. Compatibility details, target-version hooks, and behavioral limitations are documented in the [NoRender Compatibility Matrix](docs/NORENDER_COMPATIBILITY.md).
+
+The feature list describes implementation status in the code, not successful in-game verification of every feature by the Lyriya Mod project.
+
+## Upstream Projects and Licensing
+
+Lyriya Mod is licensed under **GPL-3.0-only**. See the [LICENSE](LICENSE) file for the full license text.
+
+The project studies, references, or adapts features from the following open-source projects. Detailed commit references, affected files, and license records are documented in [docs/UPSTREAM_SOURCES.md](docs/UPSTREAM_SOURCES.md).
+
+- [Meteor Client](https://github.com/MeteorDevelopment/meteor-client) — GPL-3.0. Some features use its behavior as a reference. Portions of the No Ghost Blocks and banner-rendering logic have been adapted from its source code. Copyright notices and modification notes are retained in the relevant source files.
+- [Meteor Lotus](https://github.com/xiaohe66/xiaohe66-meteor-lotus) — GPL-3.0. Used to research several features. The current source records indicate that no source code was copied from this project.
+- [MaLiLib](https://github.com/maruohon/malilib) and its [community build source for Minecraft 26.3](https://github.com/sakura-ryoko/malilib) — LGPL-3.0. MaLiLib is a separately installed runtime dependency and is not bundled with the Lyriya JAR.
+
+Any future porting of upstream code must retain the applicable copyright and license notices and document the scope of modifications in the source records.
+
+## Building
+
+Use JDK 25 or later.
 
 ```powershell
 .\gradlew.bat build --offline
 ```
 
-依赖已解析并缓存后可离线构建；首次解析 MaLiLib 需要联网。输出目录为 `build/libs/`。构建和静态检查结果见 [docs/TESTING.md](docs/TESTING.md)，上游来源及许可证范围见 [docs/UPSTREAM_SOURCES.md](docs/UPSTREAM_SOURCES.md)。
+Offline builds are supported after dependencies have been resolved and cached. The initial dependency resolution for MaLiLib requires an internet connection.
 
-## 许可证
+Build artifacts are generated in `build/libs/`.
 
-Lyriya Mod 使用 GPL-3.0-only；MaLiLib 作为独立 LGPL-3.0-only 依赖。许可证与移植范围记录见 [docs/UPSTREAM_SOURCES.md](docs/UPSTREAM_SOURCES.md)。
+Build and static analysis results are documented in [docs/TESTING.md](docs/TESTING.md). Upstream sources and licensing details are documented in [docs/UPSTREAM_SOURCES.md](docs/UPSTREAM_SOURCES.md).
+
+## License
+
+Lyriya Mod is licensed under **GPL-3.0-only**. MaLiLib is a separate **LGPL-3.0-only** dependency.
+
+See [LICENSE](LICENSE) and [docs/UPSTREAM_SOURCES.md](docs/UPSTREAM_SOURCES.md) for license information and records of adapted upstream code.
