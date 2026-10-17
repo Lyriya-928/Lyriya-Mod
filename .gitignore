@@ -1,0 +1,42 @@
+# Gradle caches and local user home
+/.gradle/
+/.gradle-home/
+
+# Build outputs and local game runs
+/build/
+/run/
+/out/
+/logs/
+/crash-reports/
+/screenshots/
+/saves/
+/config/
+
+# IDE and editor state
+/.idea/
+/.vscode/
+/.fleet/
+/.run/
+/.settings/
+/.project
+/.classpath
+*.iml
+*.swp
+*.swo
+*~
+
+# OS and temporary files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.bak
+*.log
+hs_err_pid*
+replay_pid*
+*.hprof
+
+# Local secrets and private configuration
+.env
+.env.*
+*.local
