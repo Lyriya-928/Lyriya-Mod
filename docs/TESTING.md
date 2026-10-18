@@ -116,16 +116,16 @@ Current artifact: `build/libs/lyriya-mod-0.1.0.jar` (144,806 bytes). Build succe
 | Languages | Parsed final packaged `en_us.json` and `zh_cn.json`; checked registered option keys | 423 matching valid keys per language; all 114 literal registered config option name/pretty-name/comment groups are covered. |
 | Artifact | `build/libs/lyriya-mod-0.1.0.jar` | 843,456 bytes; generated 2026-10-18 06:09:24 UTC. |
 | In-game testing | Not run | No `runClient`, client launch, or world entry was performed. All changes remain subject to user gameplay validation. |
-# Lyriya Mod 0.1.2 — user gameplay checks
+# Lyriya Mod 0.1.3 — user gameplay checks
 
 These checks are for a Minecraft 26.3 client with the project's configured Fabric Loader, Fabric API, and MaLiLib versions. They are manual gameplay checks; the build described below does not replace them.
 
 ## Auto Crafting: spruce logs to spruce planks
 
-1. Enable Auto Crafting and add spruce planks from **Auto Crafting → Add items**. Search must be visibly inside the popup listing candidate items; verify localized-name and `minecraft:spruce_planks` search, case-insensitive live filtering, no-results feedback, clearing, and multi-selection. Adding must preserve earlier whitelist entries.
-2. Set **Open Screen** mode. Put a stack of spruce logs in the player inventory, leave at least one genuinely empty player inventory slot, and open a normal crafting table. No C/V key is needed to start this mode.
+1. Enable Auto Crafting and add spruce planks from **Auto Crafting → Add items**. Search must be visibly inside the popup listing candidate items, and each row should show a vanilla item icon beside its localized name. Verify localized-name and `minecraft:spruce_planks` search, case-insensitive live filtering, no-results feedback, clearing, and multi-selection. Adding must preserve earlier whitelist entries.
+2. Set **Open Screen** mode. Put a stack of spruce logs in the player inventory, leave at least one genuinely empty player inventory slot, and open a normal crafting table. No C/V key is needed to start this mode. Verify **Drop Results When Auto-Started** defaults off and separately test it on and off.
 3. Verify the recipe book's spruce-planks recipe is requested, the result appears and is shift-clicked into inventory, then the workflow waits for slot synchronization before continuing. Confirm inputs are consumed and unrelated inventory stacks remain untouched. The prior false “no inventory space” condition used `getSlotWithRemainingSpace` alone; 26.3 returns -1 when no matching partial stack exists even if an empty slot is available.
-4. Set **Hotkey** mode and repeat with C. C keeps results and follows Lotus's rule that at least one player inventory slot is empty. Repeat with V; it throws only the crafting result stack and does not require inventory capacity. Verify continuous crafting and no duplicate recipe request during synchronization.
+4. Set **Hotkey** mode, open the crafting table, and press C. C keeps results and follows Lotus's rule that at least one player inventory slot is empty. Press C again to stop; restart with V, which throws only the crafting result stack and does not require inventory capacity. Verify continuous crafting and no duplicate recipe request during synchronization. Focus the recipe-book search box and confirm C/V type normally there.
 5. Place a valid result in the output slot before starting; it should be handled before choosing a recipe-book target. Close the table, exhaust materials, and test a full inventory. Each unable-to-continue state should give a specific localized reason, and V must never throw unrelated inventory items.
 
 ## Freecam
@@ -140,9 +140,15 @@ These checks are for a Minecraft 26.3 client with the project's configured Fabri
 1. In both English and Simplified Chinese, open **Auto Crafting → Add items**. Search inside the item-selection window by localized name and registry ID, verify live filtering, case-insensitive text, no-result feedback, clearing, multi-selection, and adding to the existing whitelist.
 2. Resize to a normal wide window and a narrow window. Verify categories are all directly reachable in a compact wrapping layout with no page controls, overlaps, clipped click targets, or list content covered by the navigation rows.
 
-## Build and static checks for 0.1.2
+## Freecam terrain check
 
-The source build is run with `.\gradlew.bat build --offline`. Inspect the generated `build/libs/lyriya-mod-0.1.2.jar` for `fabric.mod.json`, the 0.1.2 version, configured dependencies, `FreecamPlayerBodyMixin`, both locale JSON resources, and the new config translations. Do not use `runClient` for these checks.
+1. In the actual Sodium setup, record the installed Sodium version. Compare Freecam with **Render Player Body** off and on.
+2. Move continuously and look in several directions, including backwards. Note whether white terrain regions appear and whether they clear after disabling Freecam.
+3. If practical, repeat without Sodium to separate the local-player entity inclusion hook from terrain renderer behavior. This build does not establish that the white-chunk symptom is fixed.
+
+## Build and static checks for 0.1.3
+
+The source build is run with `.\gradlew.bat build --offline`. Inspect the generated `build/libs/lyriya-mod-0.1.3.jar` for `fabric.mod.json`, the 0.1.3 version, configured dependencies, `FreecamPlayerBodyMixin`, the selector row class, both locale JSON resources, and new config translations. Do not use `runClient` for these checks.
 
 No game client or world is started as part of the automated delivery. Record any observed behavior and the exact test conditions above when reporting gameplay results.
 

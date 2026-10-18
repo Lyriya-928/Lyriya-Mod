@@ -47,8 +47,11 @@ public final class AutoCraftingFeature extends Feature {
 
     private AutoCraftingFeature() { super("auto_crafting", LyriyaConfig.AUTO_CRAFTING_ENABLED); }
 
-    /** C/V select the output handling mode and start or continue the Lotus-style task. */
+    /** C/V select the output handling mode and start, switch, or stop the task. */
     public static void toggleTask(boolean drop) { INSTANCE.startTask(drop); }
+
+    /** Called by the narrowly scoped CraftingScreen keyboard hook after MaLiLib binding matching. */
+    public static void handleCraftingScreenHotkey(boolean drop) { INSTANCE.startTask(drop); }
 
     private void startTask(boolean drop) {
         Minecraft client = Minecraft.getInstance();
@@ -65,17 +68,23 @@ public final class AutoCraftingFeature extends Feature {
             showMessage(client, "message.lyriya_mod.crafting_cursor_busy");
             return;
         }
-        if (!drop && client.player.getInventory().getFreeSlot() < 0) {
-            showMessage(client, "message.lyriya_mod.crafting_empty_slot_required");
-            return;
-        }
-
         if (taskRunning && activeLevel == client.level && activeMenu == menu) {
+            if (dropOutput == drop) {
+                taskRunning = false;
+                stoppedForCurrentScreen = currentMode() == AutoCraftingMode.OPEN_SCREEN;
+                showMessage(client, "message.lyriya_mod.crafting_stopped");
+                return;
+            }
             // As in Lotus, another C/V press changes the handling mode without
             // issuing a duplicate request while the current result is syncing.
             dropOutput = drop;
             showMessage(client, Component.translatable("message.lyriya_mod.crafting_mode_changed",
                 Component.translatable(drop ? "message.lyriya_mod.crafting_drop" : "message.lyriya_mod.crafting_keep")));
+            return;
+        }
+
+        if (!drop && client.player.getInventory().getFreeSlot() < 0) {
+            showMessage(client, "message.lyriya_mod.crafting_empty_slot_required");
             return;
         }
 
@@ -109,10 +118,16 @@ public final class AutoCraftingFeature extends Feature {
             if (currentMode() == AutoCraftingMode.HOTKEY) return;
         }
         if (activeLevel == null) activeLevel = client.level;
-        if (activeMenu == null) activeMenu = menu;
+        if (activeMenu == null) {
+            activeMenu = menu;
+            if (currentMode() == AutoCraftingMode.OPEN_SCREEN) {
+                dropOutput = LyriyaConfig.AUTO_CRAFTING_DROP_ON_OPEN_SCREEN.getBooleanValue();
+            }
+        }
         boolean manualTask = taskRunning;
         if (!manualTask && (currentMode() != AutoCraftingMode.OPEN_SCREEN || stoppedForCurrentScreen)) return;
-        if (!manualTask && !dropOutput && client.player.getInventory().getFreeSlot() < 0) {
+        boolean dropThisTask = dropOutput;
+        if (!dropThisTask && client.player.getInventory().getFreeSlot() < 0) {
             stopWithMessage(client, "message.lyriya_mod.crafting_empty_slot_required");
             return;
         }
@@ -162,13 +177,13 @@ public final class AutoCraftingFeature extends Feature {
                     : "message.lyriya_mod.crafting_existing_output");
                 return;
             }
-            if (!dropOutput && client.player.getInventory().getFreeSlot() < 0) {
+            if (!dropThisTask && client.player.getInventory().getFreeSlot() < 0) {
                 stopWithMessage(client, "message.lyriya_mod.crafting_inventory_full");
                 return;
             }
             inputSignatureBeforeOutput = inputSignature(menu);
             client.gameMode.handleContainerInput(menu.containerId, CraftingMenu.RESULT_SLOT,
-                dropOutput ? 1 : 0, dropOutput ? ContainerInput.THROW : ContainerInput.QUICK_MOVE, client.player);
+                dropThisTask ? 1 : 0, dropThisTask ? ContainerInput.THROW : ContainerInput.QUICK_MOVE, client.player);
             awaitingCraftOutput = false;
             awaitingResultSync = true;
             pendingTicks = 0;
@@ -193,7 +208,7 @@ public final class AutoCraftingFeature extends Feature {
             if (result == null) continue;
             if (activeTarget == null) activeTarget = result;
             if (activeTarget != result) continue;
-            if (!dropOutput && client.player.getInventory().getFreeSlot() < 0) continue;
+            if (!dropThisTask && client.player.getInventory().getFreeSlot() < 0) continue;
             selected = entry;
             break;
         }

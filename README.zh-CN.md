@@ -9,7 +9,7 @@ Lyriya Mod 是面向技术生存、生电和红石工程的 Fabric 客户端实�
 使用 Minecraft 26.3、Fabric Loader 0.19.5+、Fabric API 0.161.0+26.3 和 Java 25+。将以下模组分别放入实例的 `mods` 目录：
 
 - **MaLiLib Fabric 26.3-0.30.2**（必需）：从 [Modrinth](https://modrinth.com/mod/malilib/version/0.30.2) 或 [CurseForge](https://www.curseforge.com/minecraft/mc-mods/malilib/files/9100218) 获取 `malilib-fabric-26.3-0.30.2.jar`。MaLiLib 是独立的 LGPL-3.0-only 依赖，不包含在 Lyriya JAR 中。
-- **Lyriya Mod 0.1.2**：构建文件为 `build/libs/lyriya-mod-0.1.2.jar`。
+- **Lyriya Mod 0.1.3**：构建文件为 `build/libs/lyriya-mod-0.1.3.jar`。
 
 Fabric 元数据将 `malilib >= 0.30.2` 声明为必需运行时依赖。不要同时安装 Meteor Client 或 Lotus 来满足 Lyriya 的依赖。
 
@@ -29,7 +29,7 @@ General 中的 **Toggle Notifications** 默认开启。功能被手动切换时�
 - **GUI Move**（`G`）：默认只允许库存/容器界面；可选其他符合条件的界面、跳跃、潜行和疾跑。文本输入及 Lyriya/MaLiLib 配置界面排除。
 - **Auto Totem**（`O`）：按健康值/Elytra 或始终模式，将背包图腾切换至副手。
 - **SafeWalk+**（`K`）：靠近前方无支撑方块边缘时，向玩家输入加入真实潜行状态；提供固定距离与随机区间模式。模块不锁定位置、不修改移动速度或坐标。跳跃时不会强制潜行。
-- **Auto Crafting**：点击 **Add items** 后，在 MaLiLib 弹出的物品选择列表内部使用搜索框，按本地化名称或物品注册 ID 实时筛选白名单候选。支持打开工作台自动执行或快捷键启动；**C** 保留产物并遵循 Lotus 的至少一个玩家背包空槽要求，**V** 丢弃产物且不要求收纳空槽。两种方式都优先处理当前结果，否则从可合成白名单配方中选一个目标，等待配方和槽位同步后继续执行。C/V 可在 MaLiLib 中修改。
+- **Auto Crafting**：点击 **Add items** 后，在 MaLiLib 弹出的物品选择列表中搜索；每行显示原版物品图标和本地化名称，也可按注册 ID 实时筛选。支持打开工作台自动执行或快捷键启动；**C** 保留产物并遵循至少一个玩家背包空槽要求，**V** 丢弃产物且不要求收纳空槽。C/V 在工作台界面内也可使用（文本框获得焦点时除外），并可在 MaLiLib 中重新绑定。自动启动默认保留产物，也可单独配置为丢弃本任务产物。
 - **Fullbright**（`F7`）：在 Gamma（覆盖光照贴图，不改玩家 Gamma 选项）、Potion（本地夜视效果，默认目标持续 120 秒）和 Luminance（Block/Sky 最低光照等级）三种模式中选择。Potion 模式不会主动替换检测到的其他来源夜视效果。
 - **NoRender**（`N`）：当前已实现参考版本中的覆盖层、HUD、雾效、天气/世界边界/破坏进度、信标/附魔书/告示牌/坠落方块、地图、烟花、刷怪笼、盔甲、实体可见性/发光、进食粒子、附魔光效、文字混淆、签名标记、屏障显示、方块随机旋转，以及可选择的实体、方块实体和粒子列表。三类列表通过本地化/可读名称选择并持久化。默认关闭的 **Drop Spawn Packets** 会丢弃匹配实体的生成数据包，使其不进入客户端世界；这会影响客户端实体可用性，不只是视觉效果。Cave Culling 和 Banner Render Mode 尚未显示为选项，原因见 [NoRender 兼容性表](docs/NORENDER_COMPATIBILITY.md)。
 - **Freecam**（`F8`）：WASD 和跳跃由自由相机消费；原版潜行键仍正常进入玩家潜行输入，并同时用于相机下降，不再需要额外的 X 绑定。可单独设置显示玩家本体（默认关闭）和显示手部。相机位置与方向逐帧插值，对角线移动归一化。自由视角只改变客户端相机，不改变服务端玩家位置。

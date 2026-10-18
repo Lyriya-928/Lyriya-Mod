@@ -4,7 +4,9 @@ import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiStringListSelection;
 import fi.dy.masa.malilib.gui.widgets.WidgetListStringSelection;
+import fi.dy.masa.malilib.gui.widgets.WidgetStringListEntry;
 import fi.dy.masa.malilib.render.GuiContext;
+import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -179,6 +181,13 @@ public final class LyriyaConfigGui extends GuiConfigsBase {
         }
 
         @Override
+        protected WidgetStringListEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd,
+                                                               String entry) {
+            Item item = itemForChoice(searchTerms.get(entry));
+            return new ItemIconStringEntry(x, y, browserEntryWidth, getBrowserEntryHeightFor(entry), isOdd, entry, listIndex, item);
+        }
+
+        @Override
         protected boolean matchesFilter(String value, String filter) {
             String needle = filter.toLowerCase(java.util.Locale.ROOT);
             return value.toLowerCase(java.util.Locale.ROOT).contains(needle);
@@ -192,6 +201,39 @@ public final class LyriyaConfigGui extends GuiConfigsBase {
                     Component.translatable("lyriya_mod.config.auto_crafting.search_no_results"),
                     posX + browserWidth / 2, posY + browserHeight / 2, 0xFFAAAAAA);
             }
+        }
+    }
+
+    private static Item itemForChoice(String id) {
+        try {
+            Item item = BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.parse(id));
+            if (item != null) return item;
+        } catch (RuntimeException ignored) { }
+        return net.minecraft.world.item.Items.AIR;
+    }
+
+    private static final class ItemIconStringEntry extends WidgetStringListEntry {
+        private final Item item;
+
+        private ItemIconStringEntry(int x, int y, int width, int height, boolean isOdd,
+                                    String label, int listIndex, Item item) {
+            super(x, y, width, height, isOdd, label, listIndex);
+            this.item = item;
+        }
+
+        @Override
+        public void render(GuiContext context, int mouseX, int mouseY, boolean selected) {
+            if (selected || isMouseOver(mouseX, mouseY)) {
+                RenderUtils.drawRect(context, x, y, width, height, -1603243920);
+            } else {
+                RenderUtils.drawRect(context, x, y, width, height, -1607454672);
+            }
+            if (selected) RenderUtils.drawOutline(context, x, y, width, height, -7286544);
+            var stack = new net.minecraft.world.item.ItemStack(item);
+            context.renderItem(stack, x + 2, y + (height - 16) / 2);
+            int textY = y + (height - fontHeight) / 2 + 1;
+            drawStringWithShadow(context, x + 22, textY, -1, entry);
+            super.postRenderHovered(context, mouseX, mouseY, selected);
         }
     }
 

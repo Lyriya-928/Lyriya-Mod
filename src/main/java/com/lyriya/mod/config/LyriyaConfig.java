@@ -173,6 +173,9 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
     public static final ConfigOptionList AUTO_CRAFTING_MODE = new ConfigOptionList(
         "mode", AutoCraftingMode.OPEN_SCREEN, "Choose automatic start on opening a crafting table or manual hotkey start"
     ).apply("lyriya_mod.config.auto_crafting");
+    public static final ConfigBoolean AUTO_CRAFTING_DROP_ON_OPEN_SCREEN = new ConfigBoolean(
+        "dropResultsWhenAutoStarted", false, "Drop task results only when crafting starts automatically on opening a table"
+    ).apply("lyriya_mod.config.auto_crafting");
     public static final ConfigStringList AUTO_CRAFTING_WHITELIST = new ConfigStringList(
         "itemWhitelist", com.google.common.collect.ImmutableList.of(), "Internal item registry keys for the selected whitelist"
     ).apply("lyriya_mod.config.auto_crafting");
@@ -328,10 +331,11 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
         SAFE_WALK_ENABLED, SAFE_WALK_BEHAVIOR, SAFE_WALK_MODE, SAFE_WALK_DISTANCE, SAFE_WALK_RANDOM_MIN, SAFE_WALK_RANDOM_MAX
     );
     public static final List<IConfigBase> AUTO_CRAFTING_OPTIONS = List.of(
-        AUTO_CRAFTING_ENABLED, AUTO_CRAFTING_MODE, AUTO_CRAFTING_DELAY, AUTO_CRAFTING_TOGGLE, AUTO_CRAFTING_DROP
+        AUTO_CRAFTING_ENABLED, AUTO_CRAFTING_MODE, AUTO_CRAFTING_DROP_ON_OPEN_SCREEN,
+        AUTO_CRAFTING_DELAY, AUTO_CRAFTING_TOGGLE, AUTO_CRAFTING_DROP
     );
     private static final List<IConfigBase> AUTO_CRAFTING_PERSISTED_OPTIONS = List.of(
-        AUTO_CRAFTING_ENABLED, AUTO_CRAFTING_MODE, AUTO_CRAFTING_WHITELIST,
+        AUTO_CRAFTING_ENABLED, AUTO_CRAFTING_MODE, AUTO_CRAFTING_DROP_ON_OPEN_SCREEN, AUTO_CRAFTING_WHITELIST,
         AUTO_CRAFTING_LEGACY_TARGET, AUTO_CRAFTING_DELAY
     );
     public static final List<IConfigBase> NO_RENDER_OPTIONS = List.of(

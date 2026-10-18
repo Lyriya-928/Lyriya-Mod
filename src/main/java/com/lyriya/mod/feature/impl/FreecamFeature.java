@@ -42,12 +42,16 @@ public final class FreecamFeature extends Feature {
         previousPitch = pitch;
         forward = backward = left = right = up = down = false;
         releaseVanillaMovementKeys();
+        // The detached camera changes the relevant view region. Invalidate the
+        // 26.3 extractor's compiled visibility data on activation and restore.
+        client.levelExtractor.allChanged();
     }
 
     @Override
     protected void onDisable() {
         Minecraft client = Minecraft.getInstance();
         if (previousPerspective != null) client.options.setCameraType(previousPerspective);
+        if (activeLevel != null) client.levelExtractor.allChanged();
         releaseVanillaMovementKeys();
         previousPerspective = null;
         activeLevel = null;

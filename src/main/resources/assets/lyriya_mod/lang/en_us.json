@@ -166,8 +166,8 @@
   "lyriya_mod.config.entity_list.name.offsetY": "Vertical offset",
   "lyriya_mod.config.entity_list.prettyName.offsetY": "Vertical offset",
   "lyriya_mod.config.entity_list.comment.offsetY": "Offset from the selected vertical edge in GUI pixels",
-  "lyriya_mod.config.entity_list.name.scalePercent": "Text scale (%)",
-  "lyriya_mod.config.entity_list.prettyName.scalePercent": "Text scale (%)",
+  "lyriya_mod.config.entity_list.name.scalePercent": "Text scale percentage",
+  "lyriya_mod.config.entity_list.prettyName.scalePercent": "Text scale percentage",
   "lyriya_mod.config.entity_list.comment.scalePercent": "HUD text scale as a percentage",
   "lyriya_mod.config.entity_list.name.rowSpacing": "Row spacing",
   "lyriya_mod.config.entity_list.prettyName.rowSpacing": "Row spacing",
@@ -275,6 +275,9 @@
   "lyriya_mod.config.safe_walk.mode.random_range": "Random range",
   "lyriya_mod.config.auto_crafting.mode.open_screen": "Automatic on opening",
   "lyriya_mod.config.auto_crafting.mode.hotkey": "Hotkey controlled",
+  "lyriya_mod.config.auto_crafting.name.dropResultsWhenAutoStarted": "Drop Results When Auto-Started",
+  "lyriya_mod.config.auto_crafting.prettyName.dropResultsWhenAutoStarted": "Drop Results When Auto-Started",
+  "lyriya_mod.config.auto_crafting.comment.dropResultsWhenAutoStarted": "When automatic start on opening is selected, drop only results produced by this task instead of keeping them.",
   "lyriya_mod.config.fullbright.mode.gamma": "Gamma",
   "lyriya_mod.config.fullbright.mode.potion": "Night Vision potion",
   "lyriya_mod.config.fullbright.mode.luminance": "Luminance",
@@ -433,5 +436,5 @@
   "lyriya_mod.config.freecam.prettyName.renderPlayerBody": "Render Player Body",
   "lyriya_mod.config.freecam.comment.renderPlayerBody": "Render your local player model at its real position while Freecam is active. Independent of Render Hands.",
   "message.lyriya_mod.crafting_enable_first": "Enable Auto Crafting before using C or V.",
-  "message.lyriya_mod.crafting_empty_slot_required": "Auto Crafting stopped: Lotus-style keep mode requires at least one empty player inventory slot."
+  "message.lyriya_mod.crafting_empty_slot_required": "Auto crafting stopped: at least one empty inventory slot is required."
 }

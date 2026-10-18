@@ -166,8 +166,8 @@
   "lyriya_mod.config.entity_list.name.offsetY": "垂直偏移",
   "lyriya_mod.config.entity_list.prettyName.offsetY": "垂直偏移",
   "lyriya_mod.config.entity_list.comment.offsetY": "相对所选屏幕边缘的垂直偏移，单位为界面像素",
-  "lyriya_mod.config.entity_list.name.scalePercent": "文字缩放（%）",
-  "lyriya_mod.config.entity_list.prettyName.scalePercent": "文字缩放（%）",
+  "lyriya_mod.config.entity_list.name.scalePercent": "文字缩放百分比",
+  "lyriya_mod.config.entity_list.prettyName.scalePercent": "文字缩放百分比",
   "lyriya_mod.config.entity_list.comment.scalePercent": "实体列表文字缩放比例",
   "lyriya_mod.config.entity_list.name.rowSpacing": "行间距",
   "lyriya_mod.config.entity_list.prettyName.rowSpacing": "行间距",
@@ -275,6 +275,9 @@
   "lyriya_mod.config.safe_walk.mode.random_range": "随机区间",
   "lyriya_mod.config.auto_crafting.mode.open_screen": "打开工作台时自动启动",
   "lyriya_mod.config.auto_crafting.mode.hotkey": "快捷键控制",
+  "lyriya_mod.config.auto_crafting.name.dropResultsWhenAutoStarted": "自动启动时丢弃产物",
+  "lyriya_mod.config.auto_crafting.prettyName.dropResultsWhenAutoStarted": "自动启动时丢弃产物",
+  "lyriya_mod.config.auto_crafting.comment.dropResultsWhenAutoStarted": "选择打开工作台自动启动时，丢弃本任务产生的产物；关闭后保留产物。",
   "lyriya_mod.config.fullbright.mode.gamma": "Gamma",
   "lyriya_mod.config.fullbright.mode.potion": "夜视效果",
   "lyriya_mod.config.fullbright.mode.luminance": "亮度等级",
@@ -433,5 +436,5 @@
   "lyriya_mod.config.freecam.prettyName.renderPlayerBody": "显示玩家本体",
   "lyriya_mod.config.freecam.comment.renderPlayerBody": "Freecam 开启时，在玩家真实位置渲染本地玩家模型；与显示手部选项相互独立。",
   "message.lyriya_mod.crafting_enable_first": "请先启用自动合成，再使用 C 或 V。",
-  "message.lyriya_mod.crafting_empty_slot_required": "自动合成已停止：按 Lotus 的保留产物规则，玩家背包需要至少一个空槽。"
+  "message.lyriya_mod.crafting_empty_slot_required": "自动合成已停止：玩家背包需要至少一个空槽。"
 }
