@@ -163,6 +163,28 @@ No game client or world is started as part of the automated delivery. Record any
 | Mixin manifest | Parsed `lyriya.mixins.json` and JAR entries | All 48 declared client Mixin classes are present, including `FreecamPlayerBodyMixin`. Static `javap` inspection confirms 26.3 `LevelExtractor.extractVisibleEntities(Camera, Frustum, DeltaTracker, LevelRenderState)` and `Camera.isDetached()` exist; the injection applies only at the local camera-entity exclusion check. This is not an application/startup test. |
 | Refmap/AP | Inspected JAR and tried Loom 1.17 Mixin AP configuration | No refmap is packaged. Loom reports this 26.3 environment as non-obfuscated; explicit Mojang mappings are rejected, while the legacy Mixin AP cannot find `mappingsFinal`. The experiment was reverted, preserving the existing build setup. The `No refMap loaded` warning and actual Mixin application remain unverified in-game. |
 | Locale and bundled code | Parsed packaged `en_us.json` and `zh_cn.json`; searched JAR entries | Both are valid JSON with 437 matching keys. New Freecam and Auto Crafting entries exist in both locales. No Meteor, Lotus, or MaLiLib implementation classes are bundled. |
+
+## Lyriya Mod 0.1.4 — user gameplay checks
+
+Do not use `runClient`; these checks are for a manually launched Minecraft 26.3 client. The build and static inspection do not establish runtime behavior.
+
+### Freecam terrain visibility
+
+1. Enable Freecam and look forward, then rotate to look behind the player. Repeat while the camera is moving, including across chunk boundaries. Check whether the formerly white terrain regions appear.
+2. Repeat with Render Player Body off and on. The camera/frustum change is independent of the player body extraction option.
+3. Disable Freecam and confirm ordinary terrain rendering and the player's camera state return to normal.
+
+### Auto Crafting whitelist editor
+
+1. Open Lyriya configuration → Auto Crafting → **Edit Item Whitelist**. Confirm the editor shows existing saved entries and preserves them when adding a new item.
+2. Add `minecraft:obsidian`; confirm the entry appears with a localized display name and registry ID. Add `黑曜石` in Chinese or `Obsidian` in English; confirm it resolves to the same stable ID and duplicate addition is reported without clearing the list.
+3. Add `深板岩,c` in Chinese; confirm all current-language item names containing the text are added. Try an unsupported suffix such as `,x` and confirm the editor explains the accepted `,c` filter.
+4. Try an empty input, a missing item ID, and `#minecraft:dragon_immune`. Confirm each is rejected with the corresponding localized message. Vanilla 26.3 packages `dragon_immune` as a **block** tag, not an item tag; a datapack may separately define an item tag by that name.
+5. Add an item tag known to exist in the current world, then start Auto Crafting and verify recipes with items from that tag can be selected. Remove selected entries and check the updated whitelist persists after relaunch.
+
+### 0.1.4 static/build checks
+
+`gradle.properties` sets the Mod version to `0.1.4`; run ` .\gradlew.bat build --offline` and inspect `build/libs/lyriya-mod-0.1.4.jar`. Verify `fabric.mod.json`, the new editor/resolver and tag update Mixin are packaged, both language JSON files parse and contain the same new keys, and no Meteor/Lotus classes are bundled. No Minecraft client was launched for this release.
 | Game behavior | Not run | No `runClient`, Minecraft launch, or world entry was performed. Follow the manual tests above. |
 
 ## 0.1.2 build and static inspection (2026-10-18)

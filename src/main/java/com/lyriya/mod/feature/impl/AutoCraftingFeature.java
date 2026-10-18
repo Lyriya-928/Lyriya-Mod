@@ -8,6 +8,7 @@
 package com.lyriya.mod.feature.impl;
 
 import com.lyriya.mod.config.AutoCraftingMode;
+import com.lyriya.mod.config.AutoCraftingWhitelist;
 import com.lyriya.mod.config.LyriyaConfig;
 import com.lyriya.mod.feature.Feature;
 import net.minecraft.client.Minecraft;
@@ -318,24 +319,7 @@ public final class AutoCraftingFeature extends Feature {
     }
 
     private static List<Item> validTargets() {
-        List<String> stored = new ArrayList<>(LyriyaConfig.AUTO_CRAFTING_WHITELIST.getStrings());
-        List<String> validIds = new ArrayList<>();
-        List<Item> items = new ArrayList<>();
-        for (String raw : stored) {
-            try {
-                Identifier id = Identifier.parse(raw);
-                Item item = BuiltInRegistries.ITEM.getValue(id);
-                if (item != null && item != net.minecraft.world.item.Items.AIR) {
-                    items.add(item);
-                    validIds.add(id.toString());
-                }
-            } catch (RuntimeException ignored) { }
-        }
-        if (!validIds.equals(stored)) {
-            LyriyaConfig.AUTO_CRAFTING_WHITELIST.setStrings(validIds);
-            LyriyaConfig.INSTANCE.save();
-        }
-        return items;
+        return AutoCraftingWhitelist.targets(Minecraft.getInstance().level);
     }
 
     private static AutoCraftingMode currentMode() {

@@ -3,10 +3,6 @@ package com.lyriya.mod.config;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiStringListSelection;
-import fi.dy.masa.malilib.gui.widgets.WidgetListStringSelection;
-import fi.dy.masa.malilib.gui.widgets.WidgetStringListEntry;
-import fi.dy.masa.malilib.render.GuiContext;
-import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -19,8 +15,6 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.item.Item;
-import net.minecraft.network.chat.Component;
 
 public final class LyriyaConfigGui extends GuiConfigsBase {
     private static Category category = Category.GENERAL;
@@ -43,15 +37,9 @@ public final class LyriyaConfigGui extends GuiConfigsBase {
             addButton(button, new CategoryListener(entry, this));
         }
         if (category == Category.AUTO_CRAFTING) {
-            ButtonGeneric add = new ButtonGeneric(10, this.height - 32, 140, 20,
-                StringUtils.translate("lyriya_mod.config.auto_crafting.add_items"));
-            addButton(add, new CraftingListListener(this, true));
-            ButtonGeneric remove = new ButtonGeneric(154, this.height - 32, 155, 20,
-                StringUtils.translate("lyriya_mod.config.auto_crafting.remove_items"));
-            addButton(remove, new CraftingListListener(this, false));
-            ButtonGeneric count = new ButtonGeneric(313, this.height - 32, 220, 20,
-                StringUtils.translate("lyriya_mod.config.auto_crafting.item_count", LyriyaConfig.AUTO_CRAFTING_WHITELIST.getStrings().size()));
-            addButton(count, new CraftingListListener(this, false));
+            ButtonGeneric edit = new ButtonGeneric(10, this.height - 32, 190, 20,
+                StringUtils.translate("lyriya_mod.config.auto_crafting.edit_whitelist"));
+            addButton(edit, new CraftingListListener(this));
         }
         if (category == Category.NO_RENDER_ENTITY) {
             ButtonGeneric addTypes = new ButtonGeneric(10, this.height - 32, 170, 20,
@@ -112,158 +100,10 @@ public final class LyriyaConfigGui extends GuiConfigsBase {
 
     private record CategoryButton(Category category, int x, int y, int width, int row) { }
 
-    private record CraftingListListener(LyriyaConfigGui parent, boolean add) implements IButtonActionListener {
+    private record CraftingListListener(LyriyaConfigGui parent) implements IButtonActionListener {
         @Override public void actionPerformedWithButton(ButtonBase button, int mouseButton) {
-            if (add) {
-                Map<String, String> choices = allItemChoices();
-                openSearchableSelection(choices, selected -> {
-                    List<String> values = new ArrayList<>(LyriyaConfig.AUTO_CRAFTING_WHITELIST.getStrings());
-                    for (String label : selected) {
-                        String id = choices.get(label);
-                        if (id != null && !values.contains(id)) values.add(id);
-                    }
-                    LyriyaConfig.AUTO_CRAFTING_WHITELIST.setStrings(values);
-                    LyriyaConfig.INSTANCE.save();
-                    return true;
-                });
-            } else {
-                Map<String, String> current = currentItemChoices();
-                openSearchableSelection(current, selected -> {
-                    List<String> values = new ArrayList<>(LyriyaConfig.AUTO_CRAFTING_WHITELIST.getStrings());
-                    for (String label : selected) values.remove(current.get(label));
-                    LyriyaConfig.AUTO_CRAFTING_WHITELIST.setStrings(values);
-                    LyriyaConfig.INSTANCE.save();
-                    return true;
-                });
-            }
+            AutoCraftingWhitelistEditor.open(parent);
         }
-    }
-
-    private static void openSearchableSelection(Map<String, String> choices, fi.dy.masa.malilib.gui.interfaces.IStringListConsumer consumer) {
-        GuiBase.openGui(new SearchableItemSelection(choices, consumer));
-    }
-
-    private static final class SearchableItemSelection extends GuiStringListSelection {
-        private final Map<String, String> searchTerms;
-
-        private SearchableItemSelection(Map<String, String> choices, fi.dy.masa.malilib.gui.interfaces.IStringListConsumer consumer) {
-            super(choices.keySet(), consumer);
-            this.searchTerms = Map.copyOf(choices);
-        }
-
-        @Override
-        public void initGui() {
-            super.initGui();
-            if (getListWidget() != null && getListWidget().getSearchBarWidget() != null) {
-                getListWidget().getSearchBarWidget().setSearchOpen(true);
-            }
-        }
-
-        @Override
-        protected WidgetListStringSelection createListWidget(int x, int y) {
-            return new SearchableItemList(x, y, getBrowserWidth(), getBrowserHeight(), this, searchTerms);
-        }
-    }
-
-    private static final class SearchableItemList extends WidgetListStringSelection {
-        private final Map<String, String> searchTerms;
-
-        private SearchableItemList(int x, int y, int width, int height,
-                fi.dy.masa.malilib.interfaces.IStringListProvider provider, Map<String, String> searchTerms) {
-            super(x, y, width, height, provider);
-            this.searchTerms = searchTerms;
-        }
-
-        @Override
-        protected List<String> getEntryStringsForFilter(String entry) {
-            String id = searchTerms.get(entry);
-            return id == null ? List.of(entry) : List.of(entry, id);
-        }
-
-        @Override
-        protected WidgetStringListEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd,
-                                                               String entry) {
-            Item item = itemForChoice(searchTerms.get(entry));
-            return new ItemIconStringEntry(x, y, browserEntryWidth, getBrowserEntryHeightFor(entry), isOdd, entry, listIndex, item);
-        }
-
-        @Override
-        protected boolean matchesFilter(String value, String filter) {
-            String needle = filter.toLowerCase(java.util.Locale.ROOT);
-            return value.toLowerCase(java.util.Locale.ROOT).contains(needle);
-        }
-
-        @Override
-        public void drawContents(GuiContext context, int mouseX, int mouseY, float partialTick) {
-            super.drawContents(context, mouseX, mouseY, partialTick);
-            if (hasFilter() && getCurrentEntries().isEmpty()) {
-                context.drawCenteredString(context.fontRenderer(),
-                    Component.translatable("lyriya_mod.config.auto_crafting.search_no_results"),
-                    posX + browserWidth / 2, posY + browserHeight / 2, 0xFFAAAAAA);
-            }
-        }
-    }
-
-    private static Item itemForChoice(String id) {
-        try {
-            Item item = BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.parse(id));
-            if (item != null) return item;
-        } catch (RuntimeException ignored) { }
-        return net.minecraft.world.item.Items.AIR;
-    }
-
-    private static final class ItemIconStringEntry extends WidgetStringListEntry {
-        private final Item item;
-
-        private ItemIconStringEntry(int x, int y, int width, int height, boolean isOdd,
-                                    String label, int listIndex, Item item) {
-            super(x, y, width, height, isOdd, label, listIndex);
-            this.item = item;
-        }
-
-        @Override
-        public void render(GuiContext context, int mouseX, int mouseY, boolean selected) {
-            if (selected || isMouseOver(mouseX, mouseY)) {
-                RenderUtils.drawRect(context, x, y, width, height, -1603243920);
-            } else {
-                RenderUtils.drawRect(context, x, y, width, height, -1607454672);
-            }
-            if (selected) RenderUtils.drawOutline(context, x, y, width, height, -7286544);
-            var stack = new net.minecraft.world.item.ItemStack(item);
-            context.renderItem(stack, x + 2, y + (height - 16) / 2);
-            int textY = y + (height - fontHeight) / 2 + 1;
-            drawStringWithShadow(context, x + 22, textY, -1, entry);
-            super.postRenderHovered(context, mouseX, mouseY, selected);
-        }
-    }
-
-    private static Map<String, String> allItemChoices() {
-        List<Item> items = new ArrayList<>();
-        BuiltInRegistries.ITEM.forEach(items::add);
-        items.sort(Comparator.comparing((Item item) -> new net.minecraft.world.item.ItemStack(item).getHoverName().getString(), String.CASE_INSENSITIVE_ORDER));
-        Map<String, String> choices = new LinkedHashMap<>();
-        Map<String, Integer> nameCounts = new java.util.HashMap<>();
-        for (Item item : items) nameCounts.merge(new net.minecraft.world.item.ItemStack(item).getHoverName().getString(), 1, Integer::sum);
-        for (Item item : items) {
-            String name = new net.minecraft.world.item.ItemStack(item).getHoverName().getString();
-            String id = BuiltInRegistries.ITEM.getKey(item).toString();
-            String label = nameCounts.get(name) > 1 ? name + " [" + id + "]" : name;
-            choices.put(label, id);
-        }
-        return choices;
-    }
-
-    private static Map<String, String> currentItemChoices() {
-        Map<String, String> choices = new LinkedHashMap<>();
-        for (String id : LyriyaConfig.AUTO_CRAFTING_WHITELIST.getStrings()) {
-            String label;
-            try {
-                Item item = BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.parse(id));
-                label = item == null ? id : new net.minecraft.world.item.ItemStack(item).getHoverName().getString();
-            } catch (RuntimeException ignored) { label = id; }
-            choices.put(label + " [" + id + "]", id);
-        }
-        return choices;
     }
 
     private record EntityTypeListListener(boolean add) implements IButtonActionListener {
