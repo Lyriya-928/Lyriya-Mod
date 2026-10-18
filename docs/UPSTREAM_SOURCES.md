@@ -52,10 +52,19 @@ This file records sources consulted while implementing Lyriya Mod. Upstream repo
   - Entity List: `src/main/java/com/xiaohe66/mc/meteor/lotus/modules/EntityList.java`
   - Auto Crafting: `src/main/java/com/xiaohe66/mc/meteor/lotus/modules/AutoCrafting.java`
   - Auto Helmet: `src/main/java/com/xiaohe66/mc/meteor/lotus/modules/AutoHelmet.java`
+- The 2026-10-18 workflow review re-read the pinned `AutoCrafting.java` above. Lyriya follows its current-result priority, craftable recipe-book selection, one-target task, C/keep and V/drop actions, and delayed repeat pattern, but uses Minecraft 26.3 `RecipeDisplayEntry`/`RecipeCollection` and `ContainerInput` APIs. No Lotus source was copied; this is a behavioral adaptation.
 - Meteor API dependencies found: module registration/settings and Orbit events; inventory utilities for Auto Helmet; Meteor's text renderer, settings, and toast APIs for Entity List. These are implementation dependencies to replace, not runtime dependencies to retain.
 - Auto Helmet imports and calls Meteor's `BaseModule`, `TickEvent`, settings, `Utils.getEnchantments`, `InvUtils`, and Orbit; its entity scan uses the old version's `PiglinEntity` and player/world APIs.
 - Entity List imports Lotus `ItemWarp`, `LogEvent`, `DisplaySide`, and `Const`, plus Meteor's module/events/settings/text renderer, name and toast utilities, and Orbit event bus. The copied implementation therefore depended on both Lotus helpers and Meteor's systems; the Lyriya version uses the client level and Fabric HUD extraction instead.
 - Scope: behavior and dependency research only; no Lotus source has been copied or modified in Lyriya Mod.
+
+## Tweakeroo Free Camera reference
+
+- Repository: https://github.com/maruohon/tweakeroo
+- License: LGPL-3.0 as declared by the upstream repository/license page (`LICENSE.txt`). No Tweakeroo source or binary is included in Lyriya Mod.
+- Research scope for this change: Free Camera's separation of camera controls from optional player inputs/movement and its independent camera state. Candidate upstream paths named by the project source browser are `src/main/java/tweakeroo/util/CameraEntity.java`, `CameraUtils.java`, and the related entity/HUD mixins.
+- Revision limitation: GitHub's source listing in the available browser exposed the `ornithe/1.12.2` branch and a short visible head `241a2a4`; direct clone/API retrieval failed in the local terminal (TLS credential acquisition failure, including a request through the session-only local proxy). That branch is not Minecraft 26.3 and a complete commit SHA or current Fabric source could not be independently confirmed in this delivery. Accordingly, no source lines are claimed to have been ported; implementation decisions were checked against the actual local Minecraft 26.3 `MouseHandler.turnPlayer` and `LocalPlayer.turn` bytecode instead.
+- Lyriya implementation scope: `FreecamFeature`, `MouseHandlerFreecamMixin`, `KeyboardInputFreecamMixin`, and `FreecamHudMixin` remain independently authored. The mouse mixin routes vanilla's already sensitivity-scaled, inverted, and optionally smoothed deltas to the free camera. No Tweakeroo runtime API or keybind system is used.
 
 ### NoRender, Fullbright, and Freecam follow-up audit
 
@@ -87,6 +96,28 @@ This file records sources consulted while implementing Lyriya Mod. Upstream repo
 - Fabric Loom: `1.17.21` (resolved from the `1.17-SNAPSHOT` plugin line)
 - Gradle Wrapper: `9.6.1`
 - The 26.3 toolchain uses Mojang's published, unobfuscated names; dependencies use `implementation` with the new `net.fabricmc.fabric-loom` plugin. No Yarn mappings dependency is configured.
+
+## Lyriya Mod 0.1.2 follow-up
+
+### Auto Crafting
+
+- Lotus source inspected at branch `1.21.11-1.16`, commit `4ca773b8198b5bb8a4ceb7c0d15c18c8516a4f7c`: `src/main/java/com/xiaohe66/mc/meteor/lotus/modules/AutoCrafting.java`.
+- The source declares author `He`; the checked-out Lotus project is GPL-3.0. The adaptation notice and source link are retained in `AutoCraftingFeature.java`; Lyriya remains GPL-3.0-only.
+- Adapted Lotus behavior: choose the visible crafting output first (and add it to the target whitelist), otherwise choose one craftable whitelist target; keep output with `QUICK_MOVE` for C, throw the result stack for V, and delay/recheck synchronized result and input state before another recipe request.
+- Minecraft 26.3 adaptation: use `RecipeCollection`/`RecipeDisplayEntry`, `handlePlaceRecipe`, `handleContainerInput`, and the current `CraftingMenu` slots in place of Lotus's 1.21.11 recipe-book and Meteor inventory APIs. No Meteor or Lotus runtime classes are used.
+- Capacity bug cause: 26.3 `Inventory.getSlotWithRemainingSpace(ItemStack)` scans only the selected/offhand and existing non-full matching stacks; it returns `-1` when an empty slot is the available destination. The old check treated that as a full inventory. C now follows Lotus's initial `getFreeSlot` requirement, which scans the 36 ordinary player inventory slots; V skips this capacity requirement. The same empty-slot check is retained before C takes a result, so a full inventory cannot silently lose a result.
+
+### MaLiLib item selector
+
+- `LyriyaConfigGui.SearchableItemSelection` subclasses MaLiLib 0.30.2's actual `GuiStringListSelection`. Its `SearchableItemList` is created inside that popup; it opens and focuses the popup list's own `WidgetSearchBar`.
+- MaLiLib's list widget forwards key/character input to that field and refreshes its visible entries through `getEntryStringsForFilter`/`matchesFilter`. Lyriya supplies both the localized display label and registry ID as filter terms, normalizes case with `Locale.ROOT`, and displays a no-results message in the same popup. The selection set is held by MaLiLib's list widget, so filtering does not clear selected entries; the add callback merges selected IDs into the saved whitelist.
+
+### Freecam and Sodium compatibility review
+
+- The separate Freecam X descend key has been removed. Freecam observes `Minecraft.options.keyShift.isDown()` for camera descent while leaving the configured vanilla key event and `KeyboardInputFreecamMixin`'s `Input.shift()` value intact for player sneak.
+- The local `.minecraft/mods` directory did not contain Sodium and the available `latest.log` is dated 2026-09-30, so the Sodium version used for the user's white-chunk report could not be identified from this workspace.
+- For a concrete 26.3 comparison, Sodium tag `mc26.3-0.9.2` (source file `common/src/main/java/net/caffeinemc/mods/sodium/mixin/core/render/world/LevelExtractorMixin.java`, release commit short SHA `03198cb`) was inspected. It redirects terrain setup in `LevelExtractor.extract` and separately replaces visible block-entity extraction; it does not overwrite `extractVisibleEntities`. Lyriya's `FreecamPlayerBodyMixin` redirects only `Camera.isDetached()` inside `extractVisibleEntities`, the local camera-entity inclusion condition. That is an entity-extraction hook, not a terrain/frustum or chunk-build hook, and the inspected Sodium source does not target that method. This narrows the suspected interaction but cannot establish the user's actual Sodium compatibility or resolve the visual symptom without the installed version and gameplay test.
+- Minecraft 26.3 is compiled and shipped with Mojang names in this Loom configuration; explicit Yarn/Mojang remapping is not configured. The Minecraft merged jar verifies the named target method. The project's attempted Mixin AP setup failed because no obfuscation mapping set exists in this non-obfuscated environment, so no refmap is generated or referenced. This build arrangement is retained; it does not itself prove runtime Mixin application.
 
 ## Licensing and redistribution
 

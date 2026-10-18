@@ -81,16 +81,20 @@ public final class FreecamFeature extends Feature {
             forward = backward = left = right = up = down = false;
             return;
         }
+        // The configured vanilla sneak key remains a real player input. Freecam
+        // observes the same mapping for vertical camera movement without capturing it.
+        down = client.options.keyShift.isDown();
         double radians = Math.toRadians(yaw);
         double forwardX = -Math.sin(radians);
         double forwardZ = Math.cos(radians);
-        double rightX = Math.cos(radians);
-        double rightZ = Math.sin(radians);
+        // KeyboardInput encodes left as +1 and right as -1. Use that same local
+        // strafe convention before rotating the vector by the camera yaw.
+        double strafe = (left ? 1 : 0) - (right ? 1 : 0);
         double dx = 0, dy = 0, dz = 0;
         if (forward) { dx += forwardX; dz += forwardZ; }
         if (backward) { dx -= forwardX; dz -= forwardZ; }
-        if (right) { dx += rightX; dz += rightZ; }
-        if (left) { dx -= rightX; dz -= rightZ; }
+        dx += Math.cos(radians) * strafe;
+        dz += Math.sin(radians) * strafe;
         double length = Math.sqrt(dx * dx + dz * dz);
         if (length > 0) {
             double speed = LyriyaConfig.FREECAM_SPEED.getDoubleValue() * 0.5;
@@ -120,13 +124,19 @@ public final class FreecamFeature extends Feature {
 
     public boolean captureKey(int key, int action) {
         Minecraft client = Minecraft.getInstance();
-        if (!isEnabled() || client.gui.screen() != null) return false;
+        if (!isEnabled() || client.gui.screen() != null) {
+            forward = backward = left = right = up = down = false;
+            return false;
+        }
+        if (!LyriyaConfig.FREECAM_CONTROL_KEYS.getBooleanValue()) {
+            forward = backward = left = right = up = down = false;
+            return false;
+        }
         if (matches(client.options.keyUp, key)) forward = action != 0;
         else if (matches(client.options.keyDown, key)) backward = action != 0;
         else if (matches(client.options.keyLeft, key)) left = action != 0;
         else if (matches(client.options.keyRight, key)) right = action != 0;
         else if (matches(client.options.keyJump, key)) up = action != 0;
-        else if (matches(client.options.keyShift, key)) down = action != 0;
         else return false;
         return true;
     }
@@ -143,16 +153,13 @@ public final class FreecamFeature extends Feature {
         client.options.keyLeft.setDown(false);
         client.options.keyRight.setDown(false);
         client.options.keyJump.setDown(false);
-        client.options.keyShift.setDown(false);
     }
 
-    public void turn(double deltaX, double deltaY) {
+    /** Receives vanilla's already sensitivity-scaled, inverted and optionally smoothed deltas. */
+    public void turnProcessed(double deltaX, double deltaY) {
         previousYaw = yaw;
         previousPitch = pitch;
-        double sensitivity = Minecraft.getInstance().options.sensitivity().get();
-        double scale = (sensitivity * 0.6 + 0.2);
-        scale = scale * scale * 8.0 * 0.15;
-        yaw += (float) (deltaX * scale);
-        pitch = Math.clamp(pitch + (float) (deltaY * scale), -90.0f, 90.0f);
+        yaw += (float) deltaX * 0.15f;
+        pitch = Math.clamp(pitch + (float) deltaY * 0.15f, -90.0f, 90.0f);
     }
 }

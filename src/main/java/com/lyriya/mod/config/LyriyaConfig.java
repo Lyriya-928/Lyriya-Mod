@@ -152,6 +152,9 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
     public static final ConfigBooleanHotkeyed SAFE_WALK_ENABLED = new ConfigBooleanHotkeyed(
         "enabled", false, "K", "Automatically sneak as you approach unsupported block edges"
     ).apply("lyriya_mod.config.safe_walk");
+    public static final ConfigOptionList SAFE_WALK_BEHAVIOR = new ConfigOptionList(
+        "behavior", SafeWalkBehavior.SOFT_SNEAK, "Choose the legacy soft edge assistance or normal edge auto-sneaking"
+    ).apply("lyriya_mod.config.safe_walk");
     public static final ConfigOptionList SAFE_WALK_MODE = new ConfigOptionList(
         "distanceMode", SafeWalkMode.FIXED, "Choose a fixed trigger distance or a random distance range"
     ).apply("lyriya_mod.config.safe_walk");
@@ -181,7 +184,11 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
         "craftDelayTicks", 4, 1, 40, "Minimum ticks between craft requests"
     ).apply("lyriya_mod.config.auto_crafting");
     public static final fi.dy.masa.malilib.config.options.ConfigHotkey AUTO_CRAFTING_TOGGLE =
-        new fi.dy.masa.malilib.config.options.ConfigHotkey("toggleCrafting", "F6", "Start or stop the crafting task in hotkey mode");
+        new fi.dy.masa.malilib.config.options.ConfigHotkey("toggleCrafting", "C", "Start or continue crafting and keep the output")
+            .apply("lyriya_mod.config.auto_crafting");
+    public static final fi.dy.masa.malilib.config.options.ConfigHotkey AUTO_CRAFTING_DROP =
+        new fi.dy.masa.malilib.config.options.ConfigHotkey("craftDrop", "V", "Start or continue crafting and drop the output")
+            .apply("lyriya_mod.config.auto_crafting");
     public static final ConfigBooleanHotkeyed NO_RENDER_ENABLED = new ConfigBooleanHotkeyed(
         "enabled", false, "N", "Disable selected visual effects"
     ).apply("lyriya_mod.config.no_render");
@@ -271,6 +278,24 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
     public static final ConfigBoolean FREECAM_SHOW_HANDS = new ConfigBoolean(
         "showHands", true, "Render first-person hands while freecam is active"
     ).apply("lyriya_mod.config.freecam");
+    public static final ConfigBoolean FREECAM_RENDER_PLAYER_BODY = new ConfigBoolean(
+        "renderPlayerBody", false, "Render the local player body at its real position while freecam is active"
+    ).apply("lyriya_mod.config.freecam");
+    public static final ConfigBoolean FREECAM_CONTROL_KEYS = new ConfigBoolean(
+        "controlKeys", true, "Use movement keys to control the free camera; when enabled, camera input takes priority over player movement"
+    ).apply("lyriya_mod.config.freecam");
+    public static final ConfigBoolean FREECAM_PLAYER_BODY_ROTATION = new ConfigBoolean(
+        "playerBodyRotation", false, "Also apply native mouse turn input to the stationary player body"
+    ).apply("lyriya_mod.config.freecam");
+    public static final ConfigBoolean FREECAM_PLAYER_BODY_MOVEMENT = new ConfigBoolean(
+        "playerBodyMovement", false, "Allow movement keys to control the player only when Control Keys is disabled"
+    ).apply("lyriya_mod.config.freecam");
+    public static final ConfigBoolean FREECAM_RENDER_HOTBAR = new ConfigBoolean(
+        "renderHotbar", true, "Show the hotbar while free camera is active"
+    ).apply("lyriya_mod.config.freecam");
+    public static final ConfigBoolean FREECAM_RENDER_STATUS_BARS = new ConfigBoolean(
+        "renderStatusBars", true, "Show health, armor, hunger and related status bars while free camera is active"
+    ).apply("lyriya_mod.config.freecam");
     public static final ConfigBooleanHotkeyed NO_GHOST_ENABLED = new ConfigBooleanHotkeyed(
         "enabled", false, "F9", "Reduce client prediction for block break and placement actions"
     ).apply("lyriya_mod.config.no_ghost_blocks");
@@ -300,10 +325,10 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
         AUTO_TOTEM_ENABLED, AUTO_TOTEM_MODE, AUTO_TOTEM_HEALTH, AUTO_TOTEM_ELYTRA, AUTO_TOTEM_DELAY
     );
     public static final List<IConfigBase> SAFE_WALK_OPTIONS = List.of(
-        SAFE_WALK_ENABLED, SAFE_WALK_MODE, SAFE_WALK_DISTANCE, SAFE_WALK_RANDOM_MIN, SAFE_WALK_RANDOM_MAX
+        SAFE_WALK_ENABLED, SAFE_WALK_BEHAVIOR, SAFE_WALK_MODE, SAFE_WALK_DISTANCE, SAFE_WALK_RANDOM_MIN, SAFE_WALK_RANDOM_MAX
     );
     public static final List<IConfigBase> AUTO_CRAFTING_OPTIONS = List.of(
-        AUTO_CRAFTING_ENABLED, AUTO_CRAFTING_MODE, AUTO_CRAFTING_DELAY
+        AUTO_CRAFTING_ENABLED, AUTO_CRAFTING_MODE, AUTO_CRAFTING_DELAY, AUTO_CRAFTING_TOGGLE, AUTO_CRAFTING_DROP
     );
     private static final List<IConfigBase> AUTO_CRAFTING_PERSISTED_OPTIONS = List.of(
         AUTO_CRAFTING_ENABLED, AUTO_CRAFTING_MODE, AUTO_CRAFTING_WHITELIST,
@@ -367,14 +392,17 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
     public static final List<IConfigBase> FULLBRIGHT_OPTIONS = List.of(
         FULLBRIGHT_ENABLED, FULLBRIGHT_MODE, FULLBRIGHT_POTION_DURATION, FULLBRIGHT_LIGHT_LAYER, FULLBRIGHT_MIN_LIGHT
     );
-    public static final List<IConfigBase> FREECAM_OPTIONS = List.of(FREECAM_ENABLED, FREECAM_SPEED, FREECAM_SHOW_HANDS);
+    public static final List<IConfigBase> FREECAM_OPTIONS = List.of(FREECAM_ENABLED, FREECAM_SPEED,
+        FREECAM_CONTROL_KEYS, FREECAM_PLAYER_BODY_ROTATION, FREECAM_PLAYER_BODY_MOVEMENT,
+        FREECAM_SHOW_HANDS, FREECAM_RENDER_PLAYER_BODY,
+        FREECAM_RENDER_HOTBAR, FREECAM_RENDER_STATUS_BARS);
     public static final List<IConfigBase> NO_GHOST_OPTIONS = List.of(
         NO_GHOST_ENABLED, NO_GHOST_BREAKING, NO_GHOST_PLACING
     );
 
     private static final List<IHotkey> HOTKEYS = List.of(
         OPEN_CONFIG, AUTO_HELMET_ENABLED, ENTITY_LIST_ENABLED, PORTALS_ENABLED, GUI_MOVE_ENABLED,
-        AUTO_TOTEM_ENABLED, SAFE_WALK_ENABLED, AUTO_CRAFTING_ENABLED, AUTO_CRAFTING_TOGGLE, NO_RENDER_ENABLED,
+        AUTO_TOTEM_ENABLED, SAFE_WALK_ENABLED, AUTO_CRAFTING_ENABLED, AUTO_CRAFTING_TOGGLE, AUTO_CRAFTING_DROP, NO_RENDER_ENABLED,
         FULLBRIGHT_ENABLED, FREECAM_ENABLED, NO_GHOST_ENABLED
     );
 
@@ -406,7 +434,11 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
         setToggleCallback(SAFE_WALK_ENABLED);
         setToggleCallback(AUTO_CRAFTING_ENABLED);
         AUTO_CRAFTING_TOGGLE.getKeybind().setCallback((action, key) -> {
-            if (action == KeyAction.PRESS) com.lyriya.mod.feature.impl.AutoCraftingFeature.toggleTask();
+            if (action == KeyAction.PRESS) com.lyriya.mod.feature.impl.AutoCraftingFeature.toggleTask(false);
+            return true;
+        });
+        AUTO_CRAFTING_DROP.getKeybind().setCallback((action, key) -> {
+            if (action == KeyAction.PRESS) com.lyriya.mod.feature.impl.AutoCraftingFeature.toggleTask(true);
             return true;
         });
         setToggleCallback(NO_RENDER_ENABLED);
@@ -449,7 +481,7 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
             AUTO_TOTEM_ENABLED, SAFE_WALK_ENABLED, AUTO_CRAFTING_ENABLED, NO_RENDER_ENABLED,
             FULLBRIGHT_ENABLED, FREECAM_ENABLED, NO_GHOST_ENABLED
         ));
-        manager.addHotkeysForCategory("Lyriya Mod", "lyriya_mod.hotkeys.auto_crafting", List.of(AUTO_CRAFTING_TOGGLE));
+        manager.addHotkeysForCategory("Lyriya Mod", "lyriya_mod.hotkeys.auto_crafting", List.of(AUTO_CRAFTING_TOGGLE, AUTO_CRAFTING_DROP));
     }
 
     @Override
@@ -475,7 +507,7 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
         ConfigUtils.readConfigBase(root, "AutoTotem", AUTO_TOTEM_OPTIONS);
         ConfigUtils.readConfigBase(root, "SafeWalk", SAFE_WALK_OPTIONS);
         ConfigUtils.readConfigBase(root, "AutoCrafting", AUTO_CRAFTING_PERSISTED_OPTIONS);
-        ConfigUtils.readHotkeys(root, "Hotkeys", List.of(AUTO_CRAFTING_TOGGLE));
+        ConfigUtils.readHotkeys(root, "Hotkeys", List.of(AUTO_CRAFTING_TOGGLE, AUTO_CRAFTING_DROP));
         ConfigUtils.readConfigBase(root, "NoRender", NO_RENDER_PERSISTED_OPTIONS);
         invalidateNoRenderChunkData();
         ConfigUtils.readConfigBase(root, "Fullbright", FULLBRIGHT_OPTIONS);
@@ -532,7 +564,7 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
         ConfigUtils.writeConfigBase(root, "AutoTotem", AUTO_TOTEM_OPTIONS);
         ConfigUtils.writeConfigBase(root, "SafeWalk", SAFE_WALK_OPTIONS);
         ConfigUtils.writeConfigBase(root, "AutoCrafting", AUTO_CRAFTING_PERSISTED_OPTIONS);
-        ConfigUtils.writeHotkeys(root, "Hotkeys", List.of(AUTO_CRAFTING_TOGGLE));
+        ConfigUtils.writeHotkeys(root, "Hotkeys", List.of(AUTO_CRAFTING_TOGGLE, AUTO_CRAFTING_DROP));
         ConfigUtils.writeConfigBase(root, "NoRender", NO_RENDER_PERSISTED_OPTIONS);
         ConfigUtils.writeConfigBase(root, "Fullbright", FULLBRIGHT_OPTIONS);
         ConfigUtils.writeConfigBase(root, "Freecam", FREECAM_OPTIONS);

@@ -3,6 +3,8 @@ package com.lyriya.mod.config;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiStringListSelection;
+import fi.dy.masa.malilib.gui.widgets.WidgetListStringSelection;
+import fi.dy.masa.malilib.render.GuiContext;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -16,24 +18,27 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
+import net.minecraft.network.chat.Component;
 
 public final class LyriyaConfigGui extends GuiConfigsBase {
     private static Category category = Category.GENERAL;
 
     public LyriyaConfigGui() {
-        super(10, 50, "lyriya_mod", null, "lyriya_mod.gui.title");
+        super(10, 96, "lyriya_mod", null, "lyriya_mod.gui.title");
     }
 
     @Override
     public void initGui() {
+        List<CategoryButton> categoryButtons = categoryButtons();
+        int rows = categoryButtons.stream().mapToInt(CategoryButton::row).max().orElse(0) + 1;
+        setListPosition(10, 26 + rows * 22 + 7);
         super.initGui();
         clearOptions();
-        int x = 10;
-        for (Category entry : Category.values()) {
-            ButtonGeneric button = new ButtonGeneric(x, 26, -1, 20, entry.displayName());
+        for (CategoryButton layout : categoryButtons) {
+            Category entry = layout.category();
+            ButtonGeneric button = new ButtonGeneric(layout.x(), layout.y(), layout.width(), 20, entry.displayName());
             button.setEnabled(category != entry);
             addButton(button, new CategoryListener(entry, this));
-            x += button.getWidth() + 2;
         }
         if (category == Category.AUTO_CRAFTING) {
             ButtonGeneric add = new ButtonGeneric(10, this.height - 32, 140, 20,
@@ -70,6 +75,24 @@ public final class LyriyaConfigGui extends GuiConfigsBase {
         }
     }
 
+    private List<CategoryButton> categoryButtons() {
+        List<CategoryButton> result = new ArrayList<>();
+        int left = 10;
+        int right = Math.max(left + 44, this.width - 10);
+        int x = left;
+        int row = 0;
+        for (Category entry : Category.values()) {
+            int width = Math.min(getStringWidth(entry.displayName()) + 10, right - left);
+            if (x > left && x + width > right) {
+                row++;
+                x = left;
+            }
+            result.add(new CategoryButton(entry, x, 26 + row * 22, width, row));
+            x += width + 2;
+        }
+        return result;
+    }
+
     @Override
     public List<ConfigOptionWrapper> getConfigs() {
         return ConfigOptionWrapper.createFor(category.options());
@@ -85,11 +108,13 @@ public final class LyriyaConfigGui extends GuiConfigsBase {
         }
     }
 
+    private record CategoryButton(Category category, int x, int y, int width, int row) { }
+
     private record CraftingListListener(LyriyaConfigGui parent, boolean add) implements IButtonActionListener {
         @Override public void actionPerformedWithButton(ButtonBase button, int mouseButton) {
             if (add) {
                 Map<String, String> choices = allItemChoices();
-                GuiBase.openGui(new GuiStringListSelection(choices.keySet(), selected -> {
+                openSearchableSelection(choices, selected -> {
                     List<String> values = new ArrayList<>(LyriyaConfig.AUTO_CRAFTING_WHITELIST.getStrings());
                     for (String label : selected) {
                         String id = choices.get(label);
@@ -98,16 +123,74 @@ public final class LyriyaConfigGui extends GuiConfigsBase {
                     LyriyaConfig.AUTO_CRAFTING_WHITELIST.setStrings(values);
                     LyriyaConfig.INSTANCE.save();
                     return true;
-                }));
+                });
             } else {
                 Map<String, String> current = currentItemChoices();
-                GuiBase.openGui(new GuiStringListSelection(current.keySet(), selected -> {
+                openSearchableSelection(current, selected -> {
                     List<String> values = new ArrayList<>(LyriyaConfig.AUTO_CRAFTING_WHITELIST.getStrings());
                     for (String label : selected) values.remove(current.get(label));
                     LyriyaConfig.AUTO_CRAFTING_WHITELIST.setStrings(values);
                     LyriyaConfig.INSTANCE.save();
                     return true;
-                }));
+                });
+            }
+        }
+    }
+
+    private static void openSearchableSelection(Map<String, String> choices, fi.dy.masa.malilib.gui.interfaces.IStringListConsumer consumer) {
+        GuiBase.openGui(new SearchableItemSelection(choices, consumer));
+    }
+
+    private static final class SearchableItemSelection extends GuiStringListSelection {
+        private final Map<String, String> searchTerms;
+
+        private SearchableItemSelection(Map<String, String> choices, fi.dy.masa.malilib.gui.interfaces.IStringListConsumer consumer) {
+            super(choices.keySet(), consumer);
+            this.searchTerms = Map.copyOf(choices);
+        }
+
+        @Override
+        public void initGui() {
+            super.initGui();
+            if (getListWidget() != null && getListWidget().getSearchBarWidget() != null) {
+                getListWidget().getSearchBarWidget().setSearchOpen(true);
+            }
+        }
+
+        @Override
+        protected WidgetListStringSelection createListWidget(int x, int y) {
+            return new SearchableItemList(x, y, getBrowserWidth(), getBrowserHeight(), this, searchTerms);
+        }
+    }
+
+    private static final class SearchableItemList extends WidgetListStringSelection {
+        private final Map<String, String> searchTerms;
+
+        private SearchableItemList(int x, int y, int width, int height,
+                fi.dy.masa.malilib.interfaces.IStringListProvider provider, Map<String, String> searchTerms) {
+            super(x, y, width, height, provider);
+            this.searchTerms = searchTerms;
+        }
+
+        @Override
+        protected List<String> getEntryStringsForFilter(String entry) {
+            String id = searchTerms.get(entry);
+            return id == null ? List.of(entry) : List.of(entry, id);
+        }
+
+        @Override
+        protected boolean matchesFilter(String value, String filter) {
+            String needle = filter.toLowerCase(java.util.Locale.ROOT);
+            return value.toLowerCase(java.util.Locale.ROOT).contains(needle);
+        }
+
+        @Override
+        public void drawContents(GuiContext context, int mouseX, int mouseY, float partialTick) {
+            super.drawContents(context, mouseX, mouseY, partialTick);
+            if (hasFilter() && getCurrentEntries().isEmpty()) {
+                context.drawCenteredString(context.fontRenderer(),
+                    Component.translatable("lyriya_mod.config.auto_crafting.search_no_results"),
+                    posX + browserWidth / 2, posY + browserHeight / 2, 0xFFAAAAAA);
             }
         }
     }
