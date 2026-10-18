@@ -42,6 +42,7 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
     private static final String ENTITY_LIST_KEY = "lyriya_mod.config.entity_list";
     private static final String PORTALS_KEY = "lyriya_mod.config.portals";
     private static final String CONFIG_FILE_NAME = "lyriya-mod.json";
+    private static final String HOTKEY_DEFAULTS_MIGRATED_KEY = "lyriyaHotkeyDefaultsMigrated";
 
     public static final ConfigHotkey OPEN_CONFIG = new ConfigHotkey(
         "openConfig", "BACKSLASH", "Open Lyriya Mod configuration"
@@ -57,7 +58,7 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
     ).apply(GENERAL_KEY);
 
     public static final ConfigBooleanHotkeyed AUTO_HELMET_ENABLED = new ConfigBooleanHotkeyed(
-        "enabled", false, "H", "Enable automatic golden helmet equipment"
+        "enabled", false, "", "Enable automatic golden helmet equipment"
     ).apply(AUTO_HELMET_KEY);
     public static final ConfigInteger AUTO_HELMET_RANGE = new ConfigInteger(
         "range", 10, 1, 40, "Maximum distance to scan for living Piglins"
@@ -67,7 +68,7 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
     ).apply(AUTO_HELMET_KEY);
 
     public static final ConfigBooleanHotkeyed ENTITY_LIST_ENABLED = new ConfigBooleanHotkeyed(
-        "enabled", false, "J", "Show the loaded client entity list"
+        "enabled", false, "", "Show the loaded client entity list"
     ).apply(ENTITY_LIST_KEY);
     public static final ConfigBoolean ENTITY_INCLUDE_DROPS = new ConfigBoolean(
         "includeDrops", true, "Include dropped item entities in the displayed groups"
@@ -115,7 +116,7 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
     public static final ConfigColor ENTITY_COLOR_OTHER = new ConfigColor("colorOther", "#FFE5E5E5", "Color for other entity rows").apply(ENTITY_LIST_KEY);
 
     public static final ConfigBooleanHotkeyed PORTALS_ENABLED = new ConfigBooleanHotkeyed(
-        "enabled", false, "P", "Keep screens open during portal effects"
+        "enabled", false, "", "Keep screens open during portal effects"
     ).apply(PORTALS_KEY);
 
     public static final ConfigBooleanHotkeyed GUI_MOVE_ENABLED = new ConfigBooleanHotkeyed(
@@ -135,7 +136,7 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
     ).apply("lyriya_mod.config.gui_move");
 
     public static final ConfigBooleanHotkeyed AUTO_TOTEM_ENABLED = new ConfigBooleanHotkeyed(
-        "enabled", false, "O", "Automatically equip a totem in the offhand when conditions require it"
+        "enabled", false, "", "Automatically equip a totem in the offhand when conditions require it"
     ).apply("lyriya_mod.config.auto_totem");
     public static final ConfigOptionList AUTO_TOTEM_MODE = new ConfigOptionList(
         "mode", AutoTotemMode.SMART, "Select when the offhand should hold a totem"
@@ -150,7 +151,7 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
         "swapDelayTicks", 0, 0, 20, "Ticks between inventory swap attempts"
     ).apply("lyriya_mod.config.auto_totem");
     public static final ConfigBooleanHotkeyed SAFE_WALK_ENABLED = new ConfigBooleanHotkeyed(
-        "enabled", false, "K", "Automatically sneak as you approach unsupported block edges"
+        "enabled", false, "", "Automatically sneak as you approach unsupported block edges"
     ).apply("lyriya_mod.config.safe_walk");
     public static final ConfigOptionList SAFE_WALK_BEHAVIOR = new ConfigOptionList(
         "behavior", SafeWalkBehavior.SOFT_SNEAK, "Choose the legacy soft edge assistance or normal edge auto-sneaking"
@@ -187,13 +188,13 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
         "craftDelayTicks", 4, 1, 40, "Minimum ticks between craft requests"
     ).apply("lyriya_mod.config.auto_crafting");
     public static final fi.dy.masa.malilib.config.options.ConfigHotkey AUTO_CRAFTING_TOGGLE =
-        new fi.dy.masa.malilib.config.options.ConfigHotkey("toggleCrafting", "C", "Start or continue crafting and keep the output")
+        new fi.dy.masa.malilib.config.options.ConfigHotkey("toggleCrafting", "", "Start or continue crafting and keep the output")
             .apply("lyriya_mod.config.auto_crafting");
     public static final fi.dy.masa.malilib.config.options.ConfigHotkey AUTO_CRAFTING_DROP =
-        new fi.dy.masa.malilib.config.options.ConfigHotkey("craftDrop", "V", "Start or continue crafting and drop the output")
+        new fi.dy.masa.malilib.config.options.ConfigHotkey("craftDrop", "", "Start or continue crafting and drop the output")
             .apply("lyriya_mod.config.auto_crafting");
     public static final ConfigBooleanHotkeyed NO_RENDER_ENABLED = new ConfigBooleanHotkeyed(
-        "enabled", false, "N", "Disable selected visual effects"
+        "enabled", false, "", "Disable selected visual effects"
     ).apply("lyriya_mod.config.no_render");
     public static final ConfigBoolean NO_RENDER_PORTAL_OVERLAY = new ConfigBoolean(
         "portalOverlay", false, "Hide the portal transition overlay"
@@ -258,7 +259,7 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
     public static final ConfigBoolean NO_RENDER_INVISIBILITY = new ConfigBoolean("invisibility", false, "Render entities that are invisible to the local player").apply("lyriya_mod.config.no_render");
     public static final ConfigBoolean NO_RENDER_GLOWING = new ConfigBoolean("glowing", false, "Hide entity glowing outlines").apply("lyriya_mod.config.no_render");
     public static final ConfigBooleanHotkeyed FULLBRIGHT_ENABLED = new ConfigBooleanHotkeyed(
-        "enabled", false, "F7", "Improve visibility using the selected brightness mode"
+        "enabled", false, "", "Improve visibility using the selected brightness mode"
     ).apply("lyriya_mod.config.fullbright");
     public static final ConfigOptionList FULLBRIGHT_MODE = new ConfigOptionList(
         "mode", FullbrightMode.GAMMA, "Select Gamma, Potion, or Luminance brightness"
@@ -273,7 +274,7 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
         "minimumLightLevel", 8, 0, 15, "Minimum queried light level in Luminance mode"
     ).apply("lyriya_mod.config.fullbright");
     public static final ConfigBooleanHotkeyed FREECAM_ENABLED = new ConfigBooleanHotkeyed(
-        "enabled", false, "F8", "Move the camera independently from the player position"
+        "enabled", false, "", "Move the camera independently from the player position"
     ).apply("lyriya_mod.config.freecam");
     public static final ConfigDouble FREECAM_SPEED = new ConfigDouble(
         "speed", 1.0, 0.1, 5.0, true, "Camera movement speed in blocks per tick"
@@ -300,7 +301,7 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
         "renderStatusBars", true, "Show health, armor, hunger and related status bars while free camera is active"
     ).apply("lyriya_mod.config.freecam");
     public static final ConfigBooleanHotkeyed NO_GHOST_ENABLED = new ConfigBooleanHotkeyed(
-        "enabled", false, "F9", "Reduce client prediction for block break and placement actions"
+        "enabled", false, "", "Reduce client prediction for block break and placement actions"
     ).apply("lyriya_mod.config.no_ghost_blocks");
     public static final ConfigBoolean NO_GHOST_BREAKING = new ConfigBoolean(
         "breaking", true, "Apply reduced client prediction while breaking blocks"
@@ -518,6 +519,7 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
         ConfigUtils.readConfigBase(root, "Freecam", FREECAM_OPTIONS);
         ConfigUtils.readConfigBase(root, "NoGhostBlocks", NO_GHOST_OPTIONS);
         boolean changed = migrateLegacyOpenKey(root);
+        changed |= migrateLegacyModuleHotkeys(root);
         JsonElement legacyTarget = root.has("AutoCrafting") && root.get("AutoCrafting").isJsonObject()
             ? root.getAsJsonObject("AutoCrafting").get("targetItem") : null;
         if (legacyTarget != null && legacyTarget.isJsonPrimitive()) {
@@ -557,9 +559,65 @@ public final class LyriyaConfig implements IConfigHandler, IInitializationHandle
         return false;
     }
 
+    /** Clears only values matching the old built-in defaults once; all custom keybinds survive. */
+    private static boolean migrateLegacyModuleHotkeys(JsonObject root) {
+        JsonElement marker = root.get(HOTKEY_DEFAULTS_MIGRATED_KEY);
+        if (marker != null && marker.isJsonPrimitive() && marker.getAsJsonPrimitive().isBoolean()
+            && marker.getAsBoolean()) return false;
+
+        boolean changed = false;
+        changed |= clearFormerDefault(root, "AutoHelmet", "enabled", "H", AUTO_HELMET_ENABLED.getKeybind());
+        changed |= clearFormerDefault(root, "EntityList", "enabled", "J", ENTITY_LIST_ENABLED.getKeybind());
+        changed |= clearFormerDefault(root, "Portals", "enabled", "P", PORTALS_ENABLED.getKeybind());
+        changed |= clearFormerDefault(root, "AutoTotem", "enabled", "O", AUTO_TOTEM_ENABLED.getKeybind());
+        changed |= clearFormerDefault(root, "SafeWalk", "enabled", "K", SAFE_WALK_ENABLED.getKeybind());
+        changed |= clearFormerDefault(root, "NoRender", "enabled", "N", NO_RENDER_ENABLED.getKeybind());
+        changed |= clearFormerDefault(root, "Fullbright", "enabled", "F7", FULLBRIGHT_ENABLED.getKeybind());
+        changed |= clearFormerDefault(root, "Freecam", "enabled", "F8", FREECAM_ENABLED.getKeybind());
+        changed |= clearFormerDefault(root, "NoGhostBlocks", "enabled", "F9", NO_GHOST_ENABLED.getKeybind());
+        changed |= clearFormerDefault(root, "Hotkeys", "toggleCrafting", "C", AUTO_CRAFTING_TOGGLE.getKeybind());
+        changed |= clearFormerDefault(root, "Hotkeys", "craftDrop", "V", AUTO_CRAFTING_DROP.getKeybind());
+        root.addProperty(HOTKEY_DEFAULTS_MIGRATED_KEY, true);
+        return true;
+    }
+
+    private static boolean clearFormerDefault(JsonObject root, String section, String option, String oldDefault, IKeybind keybind) {
+        JsonElement sectionElement = root.get(section);
+        if (sectionElement == null || !sectionElement.isJsonObject()) return false;
+        JsonElement optionElement = sectionElement.getAsJsonObject().get(option);
+        if (optionElement == null || !optionElement.isJsonObject()) return false;
+
+        JsonElement bindElement = optionElement.getAsJsonObject().get("hotkey");
+        if (bindElement == null) bindElement = optionElement;
+        String stored = readStoredKeys(bindElement);
+        if (!matchesFormerDefault(stored, oldDefault)) return false;
+
+        keybind.setValueFromString("");
+        return true;
+    }
+
+    private static String readStoredKeys(JsonElement element) {
+        if (element == null) return null;
+        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) return element.getAsString();
+        if (element.isJsonObject()) {
+            JsonElement keys = element.getAsJsonObject().get("keys");
+            if (keys != null && keys.isJsonPrimitive() && keys.getAsJsonPrimitive().isString()) return keys.getAsString();
+        }
+        return null;
+    }
+
+    private static boolean matchesFormerDefault(String stored, String oldDefault) {
+        if (stored == null) return false;
+        String normalized = stored.trim().toUpperCase(java.util.Locale.ROOT);
+        return normalized.equals(oldDefault)
+            || normalized.equals("KEY.KEYBOARD." + oldDefault)
+            || normalized.equals("KEYBOARD." + oldDefault);
+    }
+
     @Override
     public void save() {
         JsonObject root = new JsonObject();
+        root.addProperty(HOTKEY_DEFAULTS_MIGRATED_KEY, true);
         ConfigUtils.writeConfigBase(root, "General", GENERAL_OPTIONS);
         ConfigUtils.writeConfigBase(root, "AutoHelmet", AUTO_HELMET_OPTIONS);
         ConfigUtils.writeConfigBase(root, "EntityList", ENTITY_LIST_OPTIONS);

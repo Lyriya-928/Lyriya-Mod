@@ -53,6 +53,15 @@ public final class AutoCraftingWhitelistEditor extends GuiBase {
         addButton(new ButtonGeneric(left + contentWidth - addWidth, 47, addWidth, 20,
             StringUtils.translate("lyriya_mod.config.auto_crafting.add")), new AddListener(this));
 
+        // Register each visible text row as a normal MaLiLib button. GuiBase dispatches
+        // these through its standard button hit-testing before text-field handling.
+        for (int row = 0; row < visibleRows(); row++) {
+            ButtonGeneric rowButton = new ButtonGeneric(left, LIST_TOP + row * ROW_HEIGHT,
+                contentWidth, ROW_HEIGHT, "");
+            rowButton.setTextCentered(false).setRenderDefaultBackground(false);
+            addButton(rowButton, new SelectRowListener(this, row));
+        }
+
         int buttonY = height - 31;
         int buttonWidth = Math.max(75, (contentWidth - 12) / 3);
         addButton(new ButtonGeneric(left, buttonY, buttonWidth, 20,
@@ -92,20 +101,10 @@ public final class AutoCraftingWhitelistEditor extends GuiBase {
         clampScroll();
     }
 
-    @Override
-    public boolean onMouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
-        int left = Math.max(10, (width - Math.min(500, width - 20)) / 2);
-        int contentWidth = Math.min(500, width - 20);
-        int listBottom = height - 48;
-        if (event.button() == 0 && event.x() >= left && event.x() < left + contentWidth
-            && event.y() >= LIST_TOP && event.y() < listBottom) {
-            int row = (int) (event.y() - LIST_TOP) / ROW_HEIGHT;
-            int index = scrollOffset + row;
-            List<String> entries = LyriyaConfig.AUTO_CRAFTING_WHITELIST.getStrings();
-            selectedIndex = index >= 0 && index < entries.size() ? index : -1;
-            return true;
-        }
-        return super.onMouseClicked(event, doubleClick);
+    private void selectVisibleRow(int row) {
+        int index = scrollOffset + row;
+        List<String> entries = LyriyaConfig.AUTO_CRAFTING_WHITELIST.getStrings();
+        selectedIndex = index >= 0 && index < entries.size() ? index : -1;
     }
 
     @Override
@@ -192,6 +191,11 @@ public final class AutoCraftingWhitelistEditor extends GuiBase {
 
     private record AddListener(AutoCraftingWhitelistEditor editor) implements IButtonActionListener {
         @Override public void actionPerformedWithButton(ButtonBase button, int mouseButton) { editor.addInput(); }
+    }
+    private record SelectRowListener(AutoCraftingWhitelistEditor editor, int row) implements IButtonActionListener {
+        @Override public void actionPerformedWithButton(ButtonBase button, int mouseButton) {
+            editor.selectVisibleRow(row);
+        }
     }
     private record RemoveListener(AutoCraftingWhitelistEditor editor) implements IButtonActionListener {
         @Override public void actionPerformedWithButton(ButtonBase button, int mouseButton) { editor.removeSelected(); }

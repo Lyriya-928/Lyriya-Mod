@@ -185,7 +185,17 @@ Do not use `runClient`; these checks are for a manually launched Minecraft 26.3 
 ### 0.1.4 static/build checks
 
 `gradle.properties` sets the Mod version to `0.1.4`; run ` .\gradlew.bat build --offline` and inspect `build/libs/lyriya-mod-0.1.4.jar`. Verify `fabric.mod.json`, the new editor/resolver and tag update Mixin are packaged, both language JSON files parse and contain the same new keys, and no Meteor/Lotus classes are bundled. No Minecraft client was launched for this release.
-| Game behavior | Not run | No `runClient`, Minecraft launch, or world entry was performed. Follow the manual tests above. |
+Game behavior was not run; the checks above remain for user gameplay validation.
+
+## Lyriya Mod 0.1.5 — user checks
+
+- Open the Lyriya configuration using `\`; verify that feature toggles and Auto Crafting C/V show no assigned key by default, then bind a module key manually and confirm the binding remains usable.
+- With an existing 0.1.4 config, confirm former built-in defaults are cleared once while bindings that differ from those former defaults remain. The migration does not delete or replace the configuration file.
+- Open Auto Crafting and click **Auto Crafting Whitelist**. Confirm the editor displays existing rules; click the row for `minecraft:oak_planks` (shown as 橡木木板 in Chinese) and check its selection highlight, then remove only that rule. Add it again, reopen the editor, and confirm it persists. Also test scrolling, invalid and duplicate input feedback, then verify the rule no longer matches crafting targets after removal.
+
+### 0.1.5 static/build checks
+
+`gradle.properties` sets the Mod version to `0.1.5`. Run `.\gradlew.bat build --offline` and inspect `build/libs/lyriya-mod-0.1.5.jar` for the matching `fabric.mod.json`, both locale JSON files, and `LyriyaConfigGui`/`LyriyaConfig` classes. No Minecraft client or `runClient` was used for this release; all checks above that describe screen behavior remain for the user's in-game validation.
 
 ## 0.1.2 build and static inspection (2026-10-18)
 
