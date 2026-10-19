@@ -28,6 +28,9 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
+      - name: Grant Gradle Wrapper permission
+        run: chmod +x ./gradlew
+
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
 
